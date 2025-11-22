@@ -1,0 +1,77 @@
+# ----------------------------
+# Python / Django
+# ----------------------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+*.pot
+*.mo
+*.log
+*.coverage
+coverage.xml
+*.pyc
+
+# Env
+env/
+.venv/
+venv/
+ENV/
+env.bak/
+*.env
+*.env.*
+
+
+# Django specific
+secret_key.txt
+db.sqlite3
+media/
+staticfiles/
+static/
+temp/
+.tmp
+
+# Migration backups
+*.orig
+
+# Byte-compiled / optimized / DLL files
+*.pyc
+*.pyo
+
+# Cache
+.cache/
+.parcel-cache/
+.pnp
+.pnp.js
+
+# Local configuration
+*.local
+*.local.*
+.env.local
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
