@@ -129,3 +129,16 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'accounts.User'
+
+CACHES = {
+    "auth": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": config("REDIS_AUTH_URL"),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "SOCKET_CONNECT_TIMEOUT": 5,
+            "SOCKET_TIMEOUT": 5,
+            "RETRY_ON_TIMEOUT": True,
+        }
+    }
+}
