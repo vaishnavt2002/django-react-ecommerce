@@ -46,4 +46,12 @@ class TempRegistrationSerive:
 
     def delete(self, verification_id: str):
         self.redis.delete(self._key(verification_id))
+
+    def set_otp(self, verification_id: str, otp_hash: str):
+        data = self.redis.get(self._key(verification_id))
+        if not data:
+            return
+        data['otp_hash'] = otp_hash
+        data = self.redis.setex(self._key(verification_id),self.TTL_SECONDS, json.dumps(data))
+
         
