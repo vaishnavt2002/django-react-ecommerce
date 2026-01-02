@@ -131,6 +131,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'accounts.User'
 
 CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+    },
     "auth": {
         "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": config("REDIS_AUTH_URL"),
@@ -142,3 +145,9 @@ CACHES = {
         }
     }
 }
+
+
+CELERY_BROKER_URL= config("REDIS_CELERY_URL")
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_TIMEZONE = TIME_ZONE
