@@ -4,7 +4,7 @@ import uuid
 from django.utils import timezone
 import json
 class TempRegistrationSerive:
-    TTL_SECONDS = 10 * 6
+    TTL_SECONDS = 10 * 60
     MAX_ATTEMPTS = 5
     
     def __init__(self):
@@ -27,10 +27,12 @@ class TempRegistrationSerive:
         return verification_id
     
     def get(self, verification_id: str) -> dict | None :
-        data = self.redis.get(self._key(verification_id))
-        if not data:
+        raw = self.redis.get(self._key(verification_id))
+        if not raw:
             return None
-        return json.loads(data)
+        if isinstance(raw, bytes):
+            raw = raw.decode("utf-8")
+        return json.loads(raw)
     
     def increment_attempts(self, verification_id: str):
         data = self.get(verification_id)
@@ -48,7 +50,7 @@ class TempRegistrationSerive:
         self.redis.delete(self._key(verification_id))
 
     def set_otp(self, verification_id: str, otp_hash: str):
-        data = self.redis.get(self._key(verification_id))
+        data = self.get(verification_id)
         if not data:
             return
         data['otp_hash'] = otp_hash
