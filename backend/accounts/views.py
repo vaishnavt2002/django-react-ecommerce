@@ -3,8 +3,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from accounts.serializers import RegisterSerializer, VerifyOTPSerializer
+from accounts.serializers import RegisterSerializer, VerifyOTPSerializer, LoginSerializer
 from accounts.services.registration_flow_service import RegistrationFlowService
+from accounts.services.auth_service import AuthService
 
 
 class RegisterAPIView(APIView):
@@ -41,3 +42,41 @@ class VerifyOTPAPIView(APIView):
                 {"message":"Registartion verified successsfully"},
                 status=status.HTTP_200_OK
             )
+class LoginAPIView(APIView):
+    def post(self, request):
+        serializer = LoginSerializer(data = request.data)
+        serializer.is_valid(raise_exception=True)
+
+        service = AuthService()
+
+        try:
+            result = service.login(
+                    email=serializer.validated_data['email'],
+                    password=serializer.validated_data['password']
+                )
+        except ValueError as e:
+            return Response({'error': str(e)}, status= status.HTTP_400_BAD_REQUEST)
+        
+        response = Response(
+                {"message":"Login Successfull"},
+                status=status.HTTP_200_OK
+            )
+        
+        response.set_cookie(
+            key="access_token",
+            value=result["access_token"],
+            httponly=True,
+            secure=False,
+            samesite="Lax",
+            max_age=15*60
+        )
+
+        response.set_cookie(
+            key="refresh_token",
+            value=result["refresh_token"],
+            httponly=True,
+            secure=False,
+            samesite="Lax",
+            max_age=7 * 24 * 60 * 60
+        )
+        return response
