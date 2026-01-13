@@ -13,7 +13,6 @@ class AuthService:
         return {
             "user": user,
             "access_token": str(refresh.access_token),
-            "refresh_tohen": str(refresh),
+            "refresh_token": str(refresh),
         }
-    
     
