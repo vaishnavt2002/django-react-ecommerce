@@ -23,3 +23,7 @@ export async function login(email, password){
     });
     return response.data
 }
+
+export async function refreshToken() {
+    await apiClient.post("api/auth/refresh/");
+}

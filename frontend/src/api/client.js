@@ -9,16 +9,57 @@ const apiClient = axios.create({
     withCredentials: true,
 });
 
+let isRefreshing = false
+let failedQueue = [];
+
+const processQueue = (error=null)=>{
+    failedQueue.forEach(({resolve, reject})=>{
+        if(error){
+            reject(error);
+        } else {
+            resolve();
+        }
+    });
+    failedQueue = [];
+}
 
 apiClient.interceptors.response.use(
     (response) => response,
-    (error) => {
-        const message =
-        error.response?.data?.error ||
-        error.response?.date?.message ||
-        "Something went wrong";
+    async (error) => {
+        const originalRequest = error.config;
 
-        return Promise.reject(new Error(message))
+        if(error.response?.status != 401){
+            const message =
+            error.response?.data?.error ||
+            error.response?.date?.message ||
+            "Something went wrong";
+
+            return Promise.reject(new Error(message))
+        }
+        if (originalRequest._retry) {
+            return Promise.reject(error);
+        }
+        originalRequest._retry = true;
+
+        if (isRefreshing){
+            return new Promise((resolve, reject) => {
+        failedQueue.push({ resolve, reject });
+        })
+        .then(() => apiClient(originalRequest))
+        .catch((err) => Promise.reject(err));
+        }
+        isRefreshing = true;
+
+        try {
+            await refreshToken();
+            processQueue();
+            return apiClient(originalRequest);
+        } catch (refreshError) {
+            processQueue(refreshError);
+            return Promise.reject(refreshError);
+        } finally {
+            isRefreshing = false;
+        }
     }
 );
 
