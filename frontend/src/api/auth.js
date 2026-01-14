@@ -25,5 +25,9 @@ export async function login(email, password){
 }
 
 export async function refreshToken() {
-    await apiClient.post("api/auth/refresh/");
+    await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/auth/refresh`,
+        {},
+        { withCredentials: true }
+    );
 }

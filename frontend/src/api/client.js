@@ -1,4 +1,5 @@
 import axios from "axios";
+import { refreshToken } from "./auth";
 
 const apiClient = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -31,7 +32,7 @@ apiClient.interceptors.response.use(
         if(error.response?.status != 401){
             const message =
             error.response?.data?.error ||
-            error.response?.date?.message ||
+            error.response?.data?.message ||
             "Something went wrong";
 
             return Promise.reject(new Error(message))
