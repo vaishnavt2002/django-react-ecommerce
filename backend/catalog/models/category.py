@@ -17,6 +17,9 @@ class Category(models.Model):
     class Meta:
         verbose_name_plural = "Categories"
 
+    def is_leaf(self) -> bool:
+        return not self.children.exists()
+
     def __str__(self):
         return self.name
     
