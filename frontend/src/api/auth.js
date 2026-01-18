@@ -1,4 +1,5 @@
 const BASE_URL = import.meta.env.VITE_API_BASE_URL
+import axios from "axios";
 import apiClient from "./client"
 
 export async function registerUser(email, password) {
@@ -26,7 +27,7 @@ export async function login(email, password){
 
 export async function refreshToken() {
     await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/auth/refresh`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/auth/refresh/`,
         {},
         { withCredentials: true }
     );

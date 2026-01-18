@@ -111,7 +111,7 @@ class RefreshTokenAPIView(APIView):
 
         response.set_cookie(
             key="access_token",
-            value=tokens.access_token,
+            value=tokens["access_token"],
             httponly=True,
             secure=False,
             samesite="Lax",
@@ -120,7 +120,7 @@ class RefreshTokenAPIView(APIView):
 
         response.set_cookie(
             key="refresh_token",
-            value=tokens.refresh_token,
+            value=tokens["refresh_token"],
             httponly=True,
             secure=False,
             samesite="Lax",
