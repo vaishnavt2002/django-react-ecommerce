@@ -11,7 +11,14 @@ class RegistrationFlowService:
         self.user_service = UserService()
 
     def start(self, *, email: str, password: str) -> dict:
-        verification_id = self.temp_service.create(email=email, raw_password=password)
+        if self.user_service.user_exists(email=email):
+            raise ValueError("User already registered")
+        verification_id = self.temp_service.create_or_refresh(email=email, raw_password=password)
+        data = self.temp_service.get(verification_id)
+        if not data:
+            raise ValueError("Registration session expired")
+        if not self.temp_service.can_resend_otp(data):
+            return {"verification_id": verification_id}
         otp, otp_hash = self.otp_service.generate()
         self.temp_service.set_otp(verification_id=verification_id, otp_hash=otp_hash)
         self.notification_service.send_otp_email(email=email, otp=otp)
@@ -33,3 +40,6 @@ class RegistrationFlowService:
         
         self.temp_service.delete(verification_id)
         return data
+
+    def resend_otp():
+        pass

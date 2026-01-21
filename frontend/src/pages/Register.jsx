@@ -29,11 +29,15 @@ export default function Register() {
     };
 
     return(
-        <AuthLayout title="Register">
-            <form onSubmit={handleSubmit}>
+        <AuthLayout 
+            title="Get started"
+            subtitle="Sign up and start shopping with us"
+        >
+            <form onSubmit={handleSubmit} className="space-y-4">
                 <input
                     type="email"
                     placeholder="Email"
+                    className="w-full rounded border px-4 py-2 focus:outline-none focus:ring"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
@@ -42,14 +46,23 @@ export default function Register() {
                 <input 
                     type="password"
                     placeholder="Password"
+                    className="w-full rounded border px-4 py-2 focus:outline-none focus:ring"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
                 />
 
-                {error && <p style={{ color: "red"}}>{error}</p>}
+                {error && (
+                    <p className="text-sm text-red-600">
+                        {error}
+                    </p>
+                    )}
 
-                <button type="submit" disabled={loading}>
+                <button 
+                type="submit" 
+                disabled={loading}
+                className="w-full rounded bg-black py-2 text-white hover:bg-gray-900 disabled:opacity-50"
+                >
                     {loading ? "Registering....": "Register"}
                 </button>
             </form>

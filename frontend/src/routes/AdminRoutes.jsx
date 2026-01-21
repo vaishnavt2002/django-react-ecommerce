@@ -5,8 +5,8 @@ import ProductCreate from "../pages/admin/ProductCreate";
 export default function AdminRoutes() {
   return (
     <Routes>
-      <Route path="/admin/products" element={<ProductList />} />
-      <Route path="/admin/products/create" element={<ProductCreate />} />
+      <Route path="products" element={<ProductList />} />
+      <Route path="products/create" element={<ProductCreate />} />
     </Routes>
   );
 }
