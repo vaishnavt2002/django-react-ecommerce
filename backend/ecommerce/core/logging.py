@@ -20,3 +20,19 @@ def configure_logging():
 
 def get_logger(name: str):
     return structlog.get_logger(name)
+
+def set_request_context(request_id: str, user_id: int | None = None):
+    request_id_ctx.set(request_id)
+    if user_id:
+        user_id_ctx.set(user_id)
+    
+    structlog.contextvars.clear_contextvars()
+    structlog.contextvars.bind_contextvars(
+        request_id=request_id,
+        user_id=user_id
+    )
+
+def clear_request_contextvars():
+    request_id_ctx.set(None)
+    user_id_ctx.set(None)
+    structlog.contextvars.clear_contextvars()

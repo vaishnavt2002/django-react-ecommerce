@@ -5,7 +5,7 @@ from django.utils import timezone
 import json
 from datetime import timedelta
 
-class TempRegistrationSerive:
+class TempRegistrationService:
     TTL_SECONDS = 10 * 60
     MAX_ATTEMPTS = 5
     OTP_RESEND_COOLDOWN = timedelta(seconds=60)
