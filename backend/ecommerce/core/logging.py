@@ -1,7 +1,10 @@
 import logging
 import structlog
 from django.conf import settings
+from contextvars import ContextVar
 
+request_id_ctx: ContextVar[str | None] = ContextVar('request_id', default=None)
+user_id_ctx: ContextVar[int | None] = ContextVar('user_id', default=None)
 def configure_logging():
     structlog.configure(
         processors=[
@@ -32,7 +35,7 @@ def set_request_context(request_id: str, user_id: int | None = None):
         user_id=user_id
     )
 
-def clear_request_contextvars():
+def clear_request_context():
     request_id_ctx.set(None)
     user_id_ctx.set(None)
     structlog.contextvars.clear_contextvars()

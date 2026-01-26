@@ -25,7 +25,7 @@ class RegistrationFlowService:
             email_domain=email.split('@')[1]
         )
         try:
-            if self.user_service.user_exists(email=email):
+            if self.user_service.user_exist(email=email):
                 logger.warning(
                     "registration_blocked_duplicate_email",
                     email_domain=email.split('@')[1]

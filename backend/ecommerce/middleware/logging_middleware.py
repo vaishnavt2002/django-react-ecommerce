@@ -1,12 +1,12 @@
 import uuid
 import time
-from ecommerce.core.logging import set_request_context, clear_request_contextvars, get_logger
+from ecommerce.core.logging import set_request_context, clear_request_context, get_logger
 
 logger = get_logger(__name__)
 
 
 class RequestContextMiddleware:
-    def __inti__(self, get_response):
+    def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
@@ -35,7 +35,7 @@ class RequestContextMiddleware:
                 exception=str(exc),
                 exc_info=True
             )
-            clear_request_contextvars()
+            clear_request_context()
             raise
 
         duration_ms = (time.time() - start_time) * 1000
@@ -56,5 +56,5 @@ class RequestContextMiddleware:
     def _get_client_ip(self, request):
         x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
         if x_forwarded_for:
-            return x_forwarded_for.split(',')[0]
+            return x_forwarded_for.split(',')[0].strip()
         return request.META.get('REMOTE_ADDR')
