@@ -1,6 +1,6 @@
 from catalog.models import Category
 from catalog.models import Product
-class AdminProductService:
+class ProductService:
     def create_product(self, *, name: str, slug: str, category: Category, gender: str, description: str = "" ) -> Product:
         product = Product(
             name=name,
@@ -14,7 +14,7 @@ class AdminProductService:
         product.save()
         return product
     
-    def update_product(self, *, product: Product, **data)-> Product:
+    def update_product(self, *, product: Product, **data) -> Product:
         for field, value in data.items():
             setattr(product, field, value)
         

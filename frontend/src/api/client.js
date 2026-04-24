@@ -13,9 +13,9 @@ const apiClient = axios.create({
 let isRefreshing = false
 let failedQueue = [];
 
-const processQueue = (error=null)=>{
-    failedQueue.forEach(({resolve, reject})=>{
-        if(error){
+const processQueue = (error = null) => {
+    failedQueue.forEach(({ resolve, reject }) => {
+        if (error) {
             reject(error);
         } else {
             resolve();
@@ -27,28 +27,31 @@ const processQueue = (error=null)=>{
 apiClient.interceptors.response.use(
     (response) => response,
     async (error) => {
-        const originalRequest = error.config;
-
-        if(error.response?.status != 401){
-            const message =
-            error.response?.data?.error ||
-            error.response?.data?.message ||
-            "Something went wrong";
-
-            return Promise.reject(new Error(message))
-        }
-        if (originalRequest._retry) {
+        if (!error.response) {
             return Promise.reject(error);
         }
+
+        const originalRequest = error.config;
+
+        if (error.response.status !== 401) {
+            return Promise.reject(error);
+        }
+
+        // if (originalRequest._retry) {
+        //     window.dispatchEvent(new CustomEvent("auth:sessionExpired"));
+        //     return Promise.reject(error);
+        // }
+
         originalRequest._retry = true;
 
-        if (isRefreshing){
+        if (isRefreshing) {
             return new Promise((resolve, reject) => {
-        failedQueue.push({ resolve, reject });
-        })
-        .then(() => apiClient(originalRequest))
-        .catch((err) => Promise.reject(err));
+                failedQueue.push({ resolve, reject });
+            })
+                .then(() => apiClient(originalRequest))
+                .catch((err) => Promise.reject(err));
         }
+
         isRefreshing = true;
 
         try {

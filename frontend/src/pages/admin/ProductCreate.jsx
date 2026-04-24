@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { fetchAdminCatagories } from "../../api/admin/categories";
+import { fetchCatagoryTree } from "../../api/admin/categories";
 import { createAdminProduct } from "../../api/admin/products";
 import ProductForm from "../../components/admin/ProductForm";
 
-export default function ProductCreate(){
+export default function ProductCreate() {
     const [categories, setCategories] = useState([]);
     const navigate = useNavigate();
-    useEffect(()=>{
-        fetchAdminCatagories().then(setCategories);
-    },[]);
-    
+    useEffect(() => {
+        fetchCatagoryTree().then(setCategories);
+    }, []);
+
     const handleSubmit = async (data) => {
         await createAdminProduct(data);
         navigate('/admin/products');
@@ -19,7 +19,7 @@ export default function ProductCreate(){
     return (
         <div>
             <h2>Create Product</h2>
-            <ProductForm 
+            <ProductForm
                 categories={categories}
                 onSubmit={handleSubmit}
                 submitLabel="Create"

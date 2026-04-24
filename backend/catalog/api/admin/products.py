@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from catalog.models import Product
-from catalog.services.admin_product_service import AdminProductService
+from catalog.services.product_service import ProductService
 from catalog.serializers.admin.product import AdminProductSerializer
 
 class AdminProductListCreateAPIView(APIView):

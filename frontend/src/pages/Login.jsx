@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../api/auth";
+import AuthLayout from "../components/AuthLayout";
 
 
 export default function Login(){
@@ -17,7 +18,7 @@ export default function Login(){
         setLoading(true);
 
         try{
-            response = await login(email, password)
+            await login(email, password);
             navigate("/")
         } catch (err) {
             setError(err.message);
@@ -27,16 +28,17 @@ export default function Login(){
     };
 
     return (
-    <div style={{ maxWidth: 400, margin: "2rem auto" }}>
-      <h2>Login</h2>
+    <AuthLayout 
+                title="Login"
+                subtitle="Login and start shopping with us"
+            >
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
-
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label>Email</label>
           <input
             type="email"
+            className="w-full rounded border px-4 py-2 focus:outline-none focus:ring"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -47,21 +49,28 @@ export default function Login(){
           <label>Password</label>
           <input
             type="password"
+            className="w-full rounded border px-4 py-2 focus:outline-none focus:ring"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
         </div>
+        {error && (
+                    <p className="text-sm text-red-600">
+                        {error}
+                    </p>
+                    )}
 
         <button
           type="submit"
           disabled={loading}
           style={{ marginTop: 16 }}
+          className="w-full rounded bg-black py-2 text-white hover:bg-gray-900 disabled:opacity-50"
         >
           {loading ? "Logging in..." : "Login"}
         </button>
       </form>
-    </div>
+      </AuthLayout>
   );
 
 
