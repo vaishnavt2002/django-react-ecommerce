@@ -28,12 +28,12 @@ class Category(models.Model):
     
     def clean(self):
         if self.parent and self.parent == self:
-            raise ValidationError("Catogory cannot be it's own parent")
+            raise ValidationError({"parent": "Category cannot be its own parent"})
         
         parent = self.parent
         while parent:
             if parent == self:
-                raise ValidationError("Circular category hierarchy detected")
+                raise ValidationError({"parent": "Circular hierarchy detected"})
             parent = parent.parent
 
 

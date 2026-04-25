@@ -5,14 +5,14 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny
 from catalog.models import Category
 from catalog.services.category_service import CategoryService
-from catalog.serializers.admin.category import AdminCategoryCreateSerializer
+from catalog.serializers.admin.category import AdminCategoryCreateSerializer, AdminCategoryUpdateSerializer
 from ecommerce.core.logging import get_logger
 from django.core.exceptions import ValidationError
 
 logger = get_logger(__name__)
 
 class AdminCategoryListCreateAPIView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAdminUser]
 
     def get(self, request):
         logger.info("admin_category_list_api_called")
@@ -95,19 +95,12 @@ class AdminCategoryUpdateAPIView(APIView):
             category_id=pk
         )
 
-        try:
-            category = Category.objects.get(pk=pk)
-        except Category.DoesNotExist:
-            logger.warning(
-                "admin_category_update_not_found",
-                category_id=pk
-            )
-            return Response(
-                {"error": "Category not found"},
-                status=status.HTTP_404_NOT_FOUND
-            )
+        category = CategoryService().get_category_by_id(pk=pk)
 
-        serializer = AdminCategorySerializer(
+        if category is None:
+            return Response({"error": "Category not found"}, status=404)
+
+        serializer = AdminCategoryUpdateSerializer(
             category,
             data=request.data,
             partial=True
@@ -122,7 +115,7 @@ class AdminCategoryUpdateAPIView(APIView):
             return Response(serializer.errors, status=400)
 
         try:
-            CategoryService().update_category(
+            updated_category = CategoryService().update_category(
                 category=category,
                 **serializer.validated_data
             )
@@ -133,17 +126,17 @@ class AdminCategoryUpdateAPIView(APIView):
             )
 
             return Response(
-                AdminCategorySerializer(category).data
+                AdminCategoryUpdateSerializer(updated_category).data
             )
 
-        except ValueError as e:
+        except ValidationError as e:
             logger.warning(
                 "admin_category_update_business_error",
                 category_id=pk,
                 error=str(e)
             )
             return Response(
-                {"error": str(e)},
+                e.message_dict if hasattr(e, "message_dict") else {"error": str(e)},
                 status=status.HTTP_400_BAD_REQUEST
             )
 

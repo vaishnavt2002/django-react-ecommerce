@@ -46,6 +46,9 @@ class CategoryService:
             parent=parent,
             exclude_id=category.id
         )
+
+        if name != category.name:
+            data["slug"] = self._get_unique_slug(name=name)
         for field, value in data.items():
             setattr(category, field, value)
         category.full_clean()
@@ -78,5 +81,11 @@ class CategoryService:
                 root_nodes.append(category_map[cat.id])
 
         return root_nodes
+    
+    def get_category_by_id(self, *, pk):
+        try:
+            return Category.objects.get(pk=pk)
+        except Category.DoesNotExist:
+            return None
 
 
