@@ -1,6 +1,6 @@
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.exceptions import AuthenticationFailed
-
+import structlog
 
 class CookieJWTAuthentication(JWTAuthentication):
     def authenticate(self, request):
@@ -23,6 +23,7 @@ class CookieJWTAuthentication(JWTAuthentication):
         try:
             validated_token = self.get_validated_token(raw_token)
             user = self.get_user(validated_token)
+            structlog.contextvars.bind_contextvars(user_id=user.id)
         except Exception:
             raise AuthenticationFailed("Invalid or expired token")
         

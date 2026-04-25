@@ -1,6 +1,7 @@
 import uuid
 import time
-from ecommerce.core.logging import set_request_context, clear_request_context, get_logger
+import structlog
+from ecommerce.core.logging import get_logger
 
 logger = get_logger(__name__)
 
@@ -13,44 +14,38 @@ class RequestContextMiddleware:
         request_id = request.META.get('HTTP_X_REQUEST_ID') or str(uuid.uuid4())
         request.request_id = request_id
 
-        user_id = request.user.id if request.user.is_authenticated else None
-        set_request_context(request_id=request_id, user_id=user_id)
+        # Bind request_id 
+        structlog.contextvars.clear_contextvars()
+        structlog.contextvars.bind_contextvars(request_id=request_id)
 
         start_time = time.time()
 
-        logger.info("request_started",
+        logger.info(
+            "request_started",
             method=request.method,
             path=request.path,
             ip_address=self._get_client_ip(request),
-            user_agent=request.META.get('HTTP_USER_AGENT', 'unknown')
+            user_agent=request.META.get('HTTP_USER_AGENT', 'unknown'),
         )
 
         try:
             response = self.get_response(request)
-        except Exception as exc:
-            logger.error(
-                "request_failed",
-                method=request.method,
-                path=request.path,
-                exception=str(exc),
-                exc_info=True
-            )
-            clear_request_context()
+        except Exception:
+            logger.exception("request_failed", method=request.method, path=request.path)
+            structlog.contextvars.clear_contextvars()
             raise
 
         duration_ms = (time.time() - start_time) * 1000
-
         logger.info(
             "request_completed",
             method=request.method,
             path=request.path,
             status_code=response.status_code,
-            duration_ms=round(duration_ms, 2)
+            duration_ms=round(duration_ms, 2),
         )
 
         response['X-Request-ID'] = request_id
-        clear_request_context()
-        
+        structlog.contextvars.clear_contextvars()
         return response
 
     def _get_client_ip(self, request):
