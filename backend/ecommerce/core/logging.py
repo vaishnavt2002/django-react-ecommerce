@@ -17,7 +17,7 @@ def configure_logging():
         ],
         wrapper_class=structlog.make_filtering_bound_logger(logging.INFO),
         context_class=dict,
-        logger_factory=structlog.PrintLoggerFactory(),
+        logger_factory=structlog.stdlib.LoggerFactory(),
         cache_logger_on_first_use=True
     )
 
@@ -26,14 +26,12 @@ def get_logger(name: str):
 
 def set_request_context(request_id: str, user_id: int | None = None):
     request_id_ctx.set(request_id)
-    if user_id:
-        user_id_ctx.set(user_id)
-    
     structlog.contextvars.clear_contextvars()
-    structlog.contextvars.bind_contextvars(
-        request_id=request_id,
-        user_id=user_id
-    )
+    bindings = {"request_id": request_id}
+    if user_id is not None:
+        user_id_ctx.set(user_id)
+        bindings["user_id"] = user_id
+    structlog.contextvars.bind_contextvars(**bindings)
 
 def clear_request_context():
     request_id_ctx.set(None)
