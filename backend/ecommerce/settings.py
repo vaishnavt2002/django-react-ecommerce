@@ -87,7 +87,8 @@ WSGI_APPLICATION = 'ecommerce.wsgi.application'
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES":(
         "accounts.authentication.CookieJWTAuthentication",
-    )
+    ),
+    "EXCEPTION_HANDLER": "ecommerce.core.exception_handler.custom_exception_handler",
 }
 
 SIMPLE_JWT = {
