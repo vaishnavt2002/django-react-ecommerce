@@ -1,6 +1,6 @@
 import pytest
 from catalog.services.category_service import CategoryService
-from django.core.exceptions import ValidationError
+from ecommerce.core.exceptions import DuplicateResource, ResourceNotFound
 from catalog.models import Category
 
 
@@ -43,15 +43,15 @@ class TestCreateCategory:
     def test_rejects_duplicate_name_under_same_parent(self, service):
         service.create_category(name="Men")
 
-        with pytest.raises(ValidationError) as exc_info:
+        with pytest.raises(DuplicateResource) as exc_info:
             service.create_category(name="Men")
 
-        assert "name" in exc_info.value.message_dict
+        assert "name" in exc_info.value.detail
 
     def test_rejects_duplicate_name_case_insensitive(self, service):
         service.create_category(name="Men")
 
-        with pytest.raises(ValidationError) as exc_info:
+        with pytest.raises(DuplicateResource) as exc_info:
             service.create_category(name="MEN")
 
     def test_allows_same_name_under_different_parents(self, service):
