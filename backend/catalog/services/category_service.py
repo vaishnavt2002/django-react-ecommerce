@@ -1,6 +1,9 @@
 from catalog.models import Category
 from django.utils.text import slugify
 from django.core.exceptions import ValidationError
+from ecommerce.core.exceptions import ResourceNotFound, DuplicateResource
+from django.db import transaction
+
 class CategoryService:
 
     def _validate_unique_name(self, *, name, parent, exclude_id = None):
@@ -13,7 +16,10 @@ class CategoryService:
             qs = qs.exclude(id=exclude_id)
         
         if qs.exists():
-            raise ValidationError({"name":"Category with this name already exists"})
+            raise DuplicateResource(
+                detail={"name": "A category with this name already exists under this parent."},
+                code="category_name_taken",
+            )
     
     def _get_unique_slug(self, *, name):
         base_slug = slugify(name)
@@ -23,7 +29,8 @@ class CategoryService:
             slug = f"{base_slug}-{counter}"
             counter += 1
         return slug
-
+    
+    @transaction.atomic
     def create_category(self, *, name, parent=None):
         self._validate_unique_name(name=name, parent=parent)
         slug = self._get_unique_slug(name=name)
@@ -37,6 +44,8 @@ class CategoryService:
         category.save()
         return category
     
+
+    @transaction.atomic
     def update_category(self, *, category, **data):
         name = data.get("name", category.name)
         parent = data.get("parent", category.parent)
@@ -55,6 +64,7 @@ class CategoryService:
         category.save()
         return category
     
+    @transaction.atomic
     def disable_category(self, *, category):
         category.is_active= False
         category.save(update_fields=["is_active"])
@@ -86,6 +96,9 @@ class CategoryService:
         try:
             return Category.objects.get(pk=pk)
         except Category.DoesNotExist:
-            return None
+            raise ResourceNotFound(
+                detail="Category not found.",
+                code="category_not_found",
+            )
 
 
